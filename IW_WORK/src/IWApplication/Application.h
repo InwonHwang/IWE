@@ -1,12 +1,12 @@
 #pragma once
 #include "stdafx.h"
 
-class CWindowMgr;
+class CWindowManager;
 
 class CApplication
 {
 private:
-	CWindowMgr *_wndMgr;
+	CWindowManager *_wndMgr;
 
 
 private:
@@ -21,6 +21,7 @@ public:
 
 	bool init();
 	void frame();
+	void shutDown();
 	void go();
 };
 

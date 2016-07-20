@@ -3,26 +3,27 @@
 
 class CApplication;
 
-class CWindowMgr
+class CWindowManager
 {
 	
 private:	
 	HWND _hWnd;	
-	LPCWSTR _wndName;
+	LPCTSTR _wndName;
 	bool isRunning;
 
 private:
 	void createWindow();
 
 public:
-	CWindowMgr();
-	~CWindowMgr();
+	CWindowManager();
+	~CWindowManager();
 
-	HWND init(LPCWSTR appName);
-	void Run(CApplication *app);
-	void ShutDown();
+	HWND init(LPCTSTR appName);
+	void run(CApplication *app);
+	void shutDown();
 
 	LRESULT CALLBACK MsgProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
 };
 
+extern CWindowManager *WMHandle;
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);

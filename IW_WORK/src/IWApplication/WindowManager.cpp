@@ -1,32 +1,31 @@
-#include "WindowMgr.h"
+#include "WindowManager.h"
 #include "Application.h"
 
-CWindowMgr *WMHandle = 0;
+CWindowManager *WMHandle = 0;
 
-CWindowMgr::CWindowMgr()
+CWindowManager::CWindowManager()
 	: _hWnd(0),
 	_wndName(0),
 	isRunning(true)
 {
 }
 
-CWindowMgr::~CWindowMgr()
+CWindowManager::~CWindowManager()
 {
 }
 
 
-HWND CWindowMgr::init(LPCWSTR appName)
+HWND CWindowManager::init(LPCTSTR appName)
 {	
 	_wndName = appName;
 	createWindow();	
 
-	if (_hWnd)
-		WMHandle = this;
+	//if (_hWnd)	WMHandle = this;
 
 	return _hWnd;
 }
 
-void CWindowMgr::Run(CApplication *app)
+void CWindowManager::run(CApplication *app)
 {
 	MSG msg;	
 
@@ -42,7 +41,7 @@ void CWindowMgr::Run(CApplication *app)
 	}
 }
 
-void CWindowMgr::ShutDown()
+void CWindowManager::shutDown()
 {
 	UnregisterClass(_wndName, GetModuleHandle(NULL));
 	WMHandle = NULL;
@@ -50,7 +49,7 @@ void CWindowMgr::ShutDown()
 }
 
 
-void CWindowMgr::createWindow()
+void CWindowManager::createWindow()
 {
 	WNDCLASSEX wc;
 
@@ -80,7 +79,7 @@ void CWindowMgr::createWindow()
 	ShowWindow(_hWnd, SW_SHOWNORMAL);
 }
 
-LRESULT CALLBACK CWindowMgr::MsgProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
+LRESULT CALLBACK CWindowManager::MsgProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
 	switch (message)
 	{
