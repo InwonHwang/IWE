@@ -14,13 +14,10 @@ CWindowManager::~CWindowManager()
 {
 }
 
-
-HWND CWindowManager::init(LPCTSTR appName)
+HWND CWindowManager::init(LPCWSTR appName)
 {	
 	_wndName = appName;
 	createWindow();	
-
-	//if (_hWnd)	WMHandle = this;
 
 	return _hWnd;
 }
@@ -61,7 +58,7 @@ void CWindowManager::createWindow()
 	wc.hInstance = GetModuleHandle(NULL);
 	wc.hCursor = LoadCursor(NULL, IDC_ARROW);
 	wc.hbrBackground = (HBRUSH)COLOR_WINDOW;
-	wc.lpszClassName = _wndName;
+	wc.lpszClassName = _wndName;		
 
 	RegisterClassEx(&wc);
 

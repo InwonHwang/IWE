@@ -6,7 +6,7 @@ class CWindowManager;
 class CApplication
 {
 private:
-	CWindowManager *_wndMgr;
+	CWindowManager *_wndManager;
 
 
 private:

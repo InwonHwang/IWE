@@ -19,7 +19,8 @@ public:
 	static CDevice * GetInstance();
 
 	bool Init(HWND hWnd);
-	LPDIRECT3DDEVICE9 GetDevice();
 	void Release();
+
+	LPDIRECT3DDEVICE9 GetDevice();	
 };
 

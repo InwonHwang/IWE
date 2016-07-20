@@ -8,7 +8,7 @@ class CWindowManager
 	
 private:	
 	HWND _hWnd;	
-	LPCTSTR _wndName;
+	LPCWSTR _wndName;
 	bool isRunning;
 
 private:
@@ -18,7 +18,7 @@ public:
 	CWindowManager();
 	~CWindowManager();
 
-	HWND init(LPCTSTR appName);
+	HWND init(LPCWSTR appName);
 	void run(CApplication *app);
 	void shutDown();
 
