@@ -1,5 +1,4 @@
 #include "XFile.h"
-#include <rmxfguid.h>
 #include <rmxftmpl.h>
 
 CXFile::CXFile()

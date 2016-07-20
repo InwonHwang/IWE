@@ -7,6 +7,7 @@
 #include <string>
 #include <map>
 
+
 typedef std::basic_string<TCHAR> tstring;
 
 #define SAFE_RELEASE(p) if(p) { p->Release(); p = NULL; }
