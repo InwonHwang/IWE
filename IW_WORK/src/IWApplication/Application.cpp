@@ -1,6 +1,7 @@
 #include "Application.h"
 #include "WindowMgr.h"
 #include "Device.h"
+#include "XFileMgr.h"
 
 CApplication::CApplication()
 {
@@ -22,6 +23,10 @@ bool CApplication::init()
 	HWND hWnd = _wndMgr->init(L"first");
 	if (hWnd == NULL) ret =  false;
 	ret = CDevice::GetInstance()->Init(hWnd);
+
+	CXFileMgr test;
+	test.test();
+	test.clear();
 
 	return ret;
 }
