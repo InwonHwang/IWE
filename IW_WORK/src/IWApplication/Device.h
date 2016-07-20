@@ -4,8 +4,8 @@
 class CDevice
 {
 private:
-	LPDIRECT3D9 _D3D;
-	LPDIRECT3DDEVICE9 _D3DDevice;
+	LPDIRECT3D9 _d3d;
+	LPDIRECT3DDEVICE9 _d3dDev;
 	HWND _hWnd;
 
 private:

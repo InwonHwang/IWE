@@ -1,2 +1,3 @@
-﻿  Application.cpp
+﻿  XFileMgr.cpp
+c:\users\hwang\desktop\dev\iw_work\src\iwapplication\xfilemgr.cpp(127): warning C4390: ';': empty controlled statement found; is this the intent?
   IWApplication.vcxproj -> C:\Users\Hwang\Desktop\Dev\IW_WORK\src\IWApplication\..\..\bin\IWApplication\Debug\IWApplication.exe

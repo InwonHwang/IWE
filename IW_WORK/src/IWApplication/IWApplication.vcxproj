@@ -23,15 +23,15 @@
     <ClCompile Include="Device.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="stdafx.cpp" />
-    <ClCompile Include="WindowManager.cpp" />
-    <ClCompile Include="XFileManager.cpp" />
+    <ClCompile Include="WindowMgr.cpp" />
+    <ClCompile Include="XFileMgr.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Application.h" />
     <ClInclude Include="Device.h" />
     <ClInclude Include="stdafx.h" />
-    <ClInclude Include="WindowManager.h" />
-    <ClInclude Include="XFileManager.h" />
+    <ClInclude Include="WindowMgr.h" />
+    <ClInclude Include="XFileMgr.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{250104E9-7B1F-432B-AE24-765D43B17C49}</ProjectGuid>
