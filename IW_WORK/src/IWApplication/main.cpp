@@ -7,4 +7,5 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	if (app.init())
 		app.go();
 	
+	app.shutDown();
 }

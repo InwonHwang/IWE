@@ -1,8 +1,8 @@
 #include "Device.h"
 
 CDevice::CDevice()
-	: _d3d(0),
-	_d3dDev(0),
+	: _D3D(0),
+	_D3DDevice(0),
 	_hWnd(0)
 {
 }
@@ -20,7 +20,7 @@ CDevice * CDevice::GetInstance()
 
 LPDIRECT3DDEVICE9 CDevice::GetDevice()
 {
-	return _d3dDev;
+	return _D3DDevice;
 }
 
 bool CDevice::Init(HWND hWnd)
@@ -32,7 +32,7 @@ bool CDevice::Init(HWND hWnd)
 
 bool CDevice::initD3D()
 {
-	_d3d = Direct3DCreate9(D3D_SDK_VERSION);    // create the Direct3D interface
+	_D3D = Direct3DCreate9(D3D_SDK_VERSION);    // create the Direct3D interface
 
 	D3DPRESENT_PARAMETERS d3dpp;    // create a struct to hold various device information
 
@@ -43,18 +43,18 @@ bool CDevice::initD3D()
 
 
 								   // create a device class using this information and the info from the d3dpp stuct
-	_d3d->CreateDevice(D3DADAPTER_DEFAULT,
+	_D3D->CreateDevice(D3DADAPTER_DEFAULT,
 		D3DDEVTYPE_HAL,
 		_hWnd,
 		D3DCREATE_HARDWARE_VERTEXPROCESSING,
 		&d3dpp,
-		&_d3dDev);
+		&_D3DDevice);
 
 	return true;
 }
 
 void CDevice::Release()
 {
-	SAFE_RELEASE(_d3dDev);
-	SAFE_RELEASE(_d3d);
+	SAFE_RELEASE(_D3DDevice);
+	SAFE_RELEASE(_D3D);
 }

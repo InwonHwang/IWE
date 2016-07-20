@@ -1,7 +1,7 @@
 #include "Application.h"
-#include "WindowMgr.h"
+#include "WindowManager.h"
 #include "Device.h"
-#include "XFileMgr.h"
+#include "XFileManager.h"
 
 CApplication::CApplication()
 {
@@ -9,31 +9,51 @@ CApplication::CApplication()
 
 
 CApplication::~CApplication()
+{	
+}
+
+void CApplication::shutDown()
 {
 	CDevice::GetInstance()->Release();
-	_wndMgr->ShutDown();
-	SAFE_DELETE(_wndMgr);	
+	_wndMgr->shutDown();
+	SAFE_DELETE(_wndMgr);
 }
 
 bool CApplication::init()
 {
 	bool ret = true;
 
-	_wndMgr = new CWindowMgr();
+	_wndMgr = new CWindowManager();
+	WMHandle = _wndMgr;
 	HWND hWnd = _wndMgr->init(L"first");
 	if (hWnd == NULL) ret =  false;
 	ret = CDevice::GetInstance()->Init(hWnd);
 
-	CXFileMgr test;
-	test.test();
-	test.clear();
+	CXFileManager test;
+
+	test.init();
+
+	LPD3DXFILEENUMOBJECT temp = test.getXFileEnumObject(_T("tiger.x"));
+
+	
+	SIZE_T childCount = 0;
+	HRESULT hr = temp->GetChildren(&childCount);
+	if (hr != S_OK)
+	{
+		DebugBox(hr, "GetChildren");
+		SAFE_RELEASE(temp);
+	}
+	else
+		DebugBox(childCount, "getchild");
+
+	test.release();
 
 	return ret;
 }
 
 void CApplication::go()
 {
-	_wndMgr->Run(this);
+	_wndMgr->run(this);
 }
 
 void CApplication::frame()
