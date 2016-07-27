@@ -18,7 +18,7 @@ public:
 	bool Init();
 	void Release();	
 
-	LPD3DXFILE GetXFile();
-	
+	LPD3DXFILE GetXFile();	
 };
 
+#define g_XFILE CXFile::GetInstance()->GetXFile()

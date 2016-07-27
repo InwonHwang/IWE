@@ -24,3 +24,5 @@ public:
 	LPDIRECT3DDEVICE9 GetDevice();	
 };
 
+#define g_Device CDevice::GetInstance()->GetDevice()
+

@@ -5,8 +5,7 @@ CWindowManager *WMHandle = 0;
 
 CWindowManager::CWindowManager()
 	: _hWnd(0),
-	_wndName(0),
-	isRunning(true)
+	_wndName(0)
 {
 }
 
@@ -24,15 +23,18 @@ HWND CWindowManager::init(LPCWSTR appName)
 
 void CWindowManager::run(CApplication *app)
 {
-	MSG msg;	
+	MSG msg;
 
-	while (isRunning)
+	while (true)		
 	{
 		while (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE))
 		{
 			TranslateMessage(&msg);
 			DispatchMessage(&msg);
 		}
+
+		if (msg.message == WM_QUIT)
+			break;
 		
 		if (app) app->frame();
 	}
@@ -83,12 +85,11 @@ LRESULT CALLBACK CWindowManager::MsgProc(HWND hWnd, UINT message, WPARAM wParam,
 		case WM_KEYDOWN :
 			switch (wParam) {
 			case VK_ESCAPE:
-				isRunning = false;			
+				PostMessage(GetActiveWindow(), WM_QUIT, NULL, NULL);
 			}
 			break;
 
-		case WM_DESTROY:
-	
+		case WM_DESTROY:	
 			PostQuitMessage(0);
 			return 0;
 		 break;
