@@ -22,15 +22,21 @@
     <ClCompile Include="Application.cpp" />
     <ClCompile Include="Device.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="myrmxftmpl.cpp" />
+    <ClCompile Include="ParsingTest.cpp" />
     <ClCompile Include="stdafx.cpp" />
     <ClCompile Include="WindowManager.cpp" />
+    <ClCompile Include="XFile.cpp" />
     <ClCompile Include="XFileManager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Application.h" />
     <ClInclude Include="Device.h" />
+    <ClInclude Include="myrmxftmpl.h" />
+    <ClInclude Include="ParsingTest.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="WindowManager.h" />
+    <ClInclude Include="XFile.h" />
     <ClInclude Include="XFileManager.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
@@ -113,7 +119,7 @@
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>d3d9.lib;d3dxof.lib;d3dx10d.lib;d3dx9d.lib;dxerr.lib;dxguid.lib;winmm.lib;comctl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>d3d9.lib;d3dxof.lib;d3dx9d.lib;dxerr.lib;dxguid.lib;legacy_stdio_definitions.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">

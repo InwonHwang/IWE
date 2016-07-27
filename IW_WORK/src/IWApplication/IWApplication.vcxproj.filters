@@ -7,6 +7,9 @@
     <ClCompile Include="stdafx.cpp" />
     <ClCompile Include="XFileManager.cpp" />
     <ClCompile Include="WindowManager.cpp" />
+    <ClCompile Include="XFile.cpp" />
+    <ClCompile Include="ParsingTest.cpp" />
+    <ClCompile Include="myrmxftmpl.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Application.h" />
@@ -14,5 +17,8 @@
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="XFileManager.h" />
     <ClInclude Include="WindowManager.h" />
+    <ClInclude Include="XFile.h" />
+    <ClInclude Include="ParsingTest.h" />
+    <ClInclude Include="myrmxftmpl.h" />
   </ItemGroup>
 </Project>
