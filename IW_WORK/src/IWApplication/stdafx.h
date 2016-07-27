@@ -15,7 +15,8 @@
 
 typedef std::basic_string<TCHAR> tstring;
 
-#define SAFE_RELEASE(p) if(p) { p->Release(); p = NULL; }
+#define SAFE_RELEASE(p) if(p) p->Release();
+#define RELEASE_COM(p) if(p) { p->Release(); p = NULL; }
 #define SAFE_DELETE(p) if(p) { delete p; p = NULL; }
 
 void DebugBox(HRESULT, LPCSTR);

@@ -35,10 +35,17 @@ bool CDevice::initD3D()
 	_D3D = Direct3DCreate9(D3D_SDK_VERSION); 
 
 	D3DPRESENT_PARAMETERS d3dpp;  
+	D3DDISPLAYMODE  display_mode;
+
+	if (FAILED(_D3D->GetAdapterDisplayMode(D3DADAPTER_DEFAULT, &display_mode)))
+		return FALSE;
 
 	ZeroMemory(&d3dpp, sizeof(d3dpp));  
-	d3dpp.Windowed = TRUE;   
-	d3dpp.SwapEffect = D3DSWAPEFFECT_DISCARD; 
+	d3dpp.Windowed = TRUE;
+	d3dpp.SwapEffect = D3DSWAPEFFECT_DISCARD;
+	d3dpp.BackBufferFormat = display_mode.Format;
+	d3dpp.EnableAutoDepthStencil = TRUE;
+	d3dpp.AutoDepthStencilFormat = D3DFMT_D16;
 	d3dpp.hDeviceWindow = _hWnd; 
 
 								   

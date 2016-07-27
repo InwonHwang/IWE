@@ -2,11 +2,9 @@
 #include "WindowManager.h"
 #include "Device.h"
 #include "XFile.h"
-#include "ParsingTest.h"
+#include "XParser.h"
 
-std::list<LPD3DXMESH> CApplication::_meshes;
-std::list<D3DMATERIAL9> CApplication::_materials;
-std::list<LPDIRECT3DTEXTURE9> CApplication::_textures;
+
 
 CApplication::CApplication()
 {
@@ -20,15 +18,7 @@ CApplication::~CApplication()
 
 void CApplication::shutDown()
 {
-	for (std::list<LPD3DXMESH>::iterator it = _meshes.begin(); it != _meshes.end(); ++it)
-	{
-		SAFE_RELEASE((*it));
-	}
-
-	_meshes.clear();
-	_materials.clear();
-	_textures.clear();
-
+	SAFE_DELETE(_frame);
 	CDevice::GetInstance()->Release();
 	CXFile::GetInstance()->Release();
 
@@ -52,15 +42,24 @@ bool CApplication::init()
 	if (!CDevice::GetInstance()->Init(hWnd)) return false;
 	if (!CXFile::GetInstance()->Init()) return false;
 
-	ParsingTest t;
+	D3DXMATRIX mat_proj, mat_view;
 
-	t.test();
+	// builds a left-handed perspective projection matrix based on a field of view
+	D3DXMatrixPerspectiveFovLH(&mat_proj, D3DX_PI / 4.0, 1.33333, 1.0, 1000.0);
 
-	D3DMATERIAL9 material;    // create the material struct	
-	ZeroMemory(&material, sizeof(D3DMATERIAL9));    // clear out the struct for use
-	material.Diffuse = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);    // set diffuse color to white
-	material.Ambient = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);    // set ambient color to white
-	g_Device->SetMaterial(&material);
+	// sets a single device transformation-related state
+	g_Device->SetTransform(D3DTS_PROJECTION, &mat_proj);
+
+	// create and set the view matrix
+	D3DXMatrixLookAtLH(&mat_view,
+		&D3DXVECTOR3(0.0, 0.0, -10.0),
+		&D3DXVECTOR3(0.0, 0.0, 0.0),
+		&D3DXVECTOR3(0.0, 1.0, 0.0));
+
+	g_Device->SetTransform(D3DTS_VIEW, &mat_view);
+
+	CXParser temp;
+	_frame = temp.parseXFile("../../media/mesh/tiger.x");
 
 	return true;
 }
@@ -83,36 +82,110 @@ void CApplication::update()
 
 void CApplication::draw()
 {
-	CDevice::GetInstance()->GetDevice()->Clear(0, NULL, D3DCLEAR_TARGET, D3DCOLOR_XRGB(0, 0, 255), 1.0f, 0);
+	//g_Device->Clear(0, NULL, D3DCLEAR_TARGET, D3DCOLOR_RGBA(0, 64, 128, 255), 1.0f, 0);
 
-	CDevice::GetInstance()->GetDevice()->BeginScene();    // begins the 3D scene
+	//g_Device->BeginScene();    // begins the 3D scene
 
-	D3DXMATRIX matView;    // the view transform matrix
-	D3DXMatrixLookAtLH(&matView,
-		&D3DXVECTOR3(0.0f, 8.0f, 16.0f),    // the camera position
-		&D3DXVECTOR3(0.0f, 0.0f, 0.0f),    // the look-at position
-		&D3DXVECTOR3(0.0f, 1.0f, 0.0f));    // the up direction
-	CDevice::GetInstance()->GetDevice()->SetTransform(D3DTS_VIEW, &matView);    // set the view transform to matView 
+	//DrawFrame(_frame);
 
-	D3DXMATRIX matProjection;    // the projection transform matrix
-	D3DXMatrixPerspectiveFovLH(&matProjection,
-		D3DXToRadian(45),    // the horizontal field of view
-		800 / 600,    // the aspect ratio
-		1.0f,    // the near view-plane
-		100.0f);    // the far view-plane
-	CDevice::GetInstance()->GetDevice()->SetTransform(D3DTS_PROJECTION, &matProjection);    // set the projection
+	//g_Device->EndScene();    // ends the 3D scene
 
-	static float index = 0.0f; index += 0.03f;    // an ever-increasing float value
-	D3DXMATRIX matRotateY;    // a matrix to store the rotation for each triangle
-	D3DXMatrixRotationY(&matRotateY, index);    // the rotation matrix
-	CDevice::GetInstance()->GetDevice()->SetTransform(D3DTS_WORLD, &(matRotateY));    // set the world transform
+	//g_Device->Present(NULL, NULL, NULL, NULL);   // displays the created frame on the screen
 
+	D3DXMATRIX mat_world;
 
-	//_meshes.front()->DrawSubset(0);
-	
+	// clear device back buffer
+	g_Device->Clear(0, NULL, D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER, D3DCOLOR_RGBA(0, 64, 128, 255), 1.0f, 0);
 
+	// Begin scene
+	if (SUCCEEDED(g_Device->BeginScene()))
+	{
+		// create and set the world transformation matrix
+		// rotate object along y-axis
+		D3DXMatrixRotationY(&mat_world, 0);
 
-	CDevice::GetInstance()->GetDevice()->EndScene();    // ends the 3D scene
+		g_Device->SetTransform(D3DTS_WORLD, &mat_world);
 
-	CDevice::GetInstance()->GetDevice()->Present(NULL, NULL, NULL, NULL);   // displays the created frame on the screen
+		// draw frames
+		DrawFrame(_frame);
+
+		// end the scene
+		g_Device->EndScene();
+	}
+
+	// present the contents of the next buffer in the sequence of back buffers owned by the device
+	g_Device->Present(NULL, NULL, NULL, NULL);
+
+	// release texture
+	g_Device->SetTexture(0, NULL);
+}
+
+void CApplication::DrawFrame(FRAME* frame)
+{
+	MESH* mesh;
+	D3DXMATRIX* matrices = NULL;
+	ID3DXMesh* mesh_to_draw;
+
+	// return if no frame
+	if (frame == NULL)
+		return;
+
+	// draw meshes if any in frame
+	if ((mesh = frame->_mesh) != NULL)
+	{
+		// setup pointer to mesh to draw
+		mesh_to_draw = mesh->_mesh;
+
+		// generate mesh from skinned mesh to draw with
+		if (mesh->_skinmesh != NULL && mesh->_skininfo != NULL)
+		{
+			DWORD num_bones = mesh->_skininfo->GetNumBones();
+
+			// allocate an array of matrices to orient bones
+			matrices = new D3DXMATRIX[num_bones];
+
+			// set all bones orientation to identity
+			for (DWORD i = 0; i < num_bones; i++)
+				D3DXMatrixIdentity(&matrices[i]);
+
+			// lock source and destination vertex buffers
+
+			void* source = NULL;
+			void* dest = NULL;
+
+			// locks a vertex buffer and obtains a pointer to the vertex buffer memory
+			mesh->_mesh->LockVertexBuffer(0, &source);
+			mesh->_skinmesh->LockVertexBuffer(0, &dest);
+
+			// update skinned mesh, applies software skinning to the target vertices based on the current matrices.
+			mesh->_skininfo->UpdateSkinnedMesh(matrices, NULL, source, dest);
+
+			// unlock buffers
+			mesh->_skinmesh->UnlockVertexBuffer();
+			mesh->_mesh->UnlockVertexBuffer();
+
+			// point to skin mesh to draw
+			mesh_to_draw = mesh->_skinmesh;
+		}
+
+		// render the mesh
+		for (DWORD i = 0; i < mesh->_numMaterials; i++)
+		{
+			// set the materials properties for the device
+			g_Device->SetMaterial(&mesh->_materials[i]);
+
+			// assigns a texture to a stage for a device
+			g_Device->SetTexture(0, mesh->_textures[i]);
+
+			// draw a subset of a mesh
+			mesh_to_draw->DrawSubset(i);
+		}
+
+		// free array of matrices
+		delete[] matrices;
+		matrices = NULL;
+	}
+
+	// draw child frames, recursively call.
+	DrawFrame(frame->_child);
 }
