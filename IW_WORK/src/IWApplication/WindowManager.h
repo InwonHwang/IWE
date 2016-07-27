@@ -9,7 +9,6 @@ class CWindowManager
 private:	
 	HWND _hWnd;	
 	LPCWSTR _wndName;
-	bool isRunning;
 
 private:
 	void createWindow();

@@ -1,5 +1,4 @@
 #include "XFile.h"
-#include <rmxftmpl.h>
 
 CXFile::CXFile()
 	: _D3DXFile(NULL)

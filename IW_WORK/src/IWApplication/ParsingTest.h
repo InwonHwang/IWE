@@ -8,5 +8,5 @@ public:
 	~ParsingTest();
 
 	void test();
+	void parseChild(LPD3DXFILEDATA);
 };
-

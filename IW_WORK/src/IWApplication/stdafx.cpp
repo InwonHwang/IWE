@@ -3,7 +3,7 @@
 void DebugBox(HRESULT hr, LPCWSTR str)
 {
 	WCHAR szBuffer[50];
-	swprintf_s(szBuffer, _T("%i"), hr);
+	swprintf_s(szBuffer, L"%i", hr);
 
 	MessageBox(GetActiveWindow(), szBuffer, str, MB_OK);
 
@@ -16,4 +16,10 @@ void DebugBox(HRESULT hr, LPCSTR str)
 
 
 	MessageBoxA(GetActiveWindow(), szBuffer, str, MB_OK); 
+}
+
+void DebugError(HRESULT hr)
+{
+
+	MessageBox(GetActiveWindow(), DXGetErrorDescription(hr), DXGetErrorString(hr), MB_OK);
 }
