@@ -1,15 +1,16 @@
 #pragma once
 #include "stdafx.h"
-#include "Mesh.h"
+#include "IXParser.h"
 
-class CXParser
+class CXParser : public IXParser
 {
-private:
-	void parseXFileData(ID3DXFileData* pData, FRAME* parent);
+protected:
+	void parseXFileData(ID3DXFileData* pData) override;
+	void parseXFile(char* filename) override;
 
 public:
 	CXParser();
 	~CXParser();
 
-	FRAME* parseXFile(char* filename);	
+	void parse(char *filename);
 };

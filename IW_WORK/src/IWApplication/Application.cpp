@@ -4,21 +4,27 @@
 #include "XFile.h"
 #include "XParser.h"
 
-
+std::map<tstring, MESH *> CApplication::_meshes;
 
 CApplication::CApplication()
 {
+	_gameObject = new CGameObject();
 }
 
 
 CApplication::~CApplication()
 {	
+	for (std::map<tstring, MESH *>::iterator it = _meshes.begin(); it != _meshes.end(); it++)
+	{
+		SAFE_DELETE((*it).second);
+	}
+	_meshes.clear();
 	shutDown();
 }
 
 void CApplication::shutDown()
 {
-	SAFE_DELETE(_frame);
+	SAFE_DELETE(_gameObject);
 	CDevice::GetInstance()->Release();
 	CXFile::GetInstance()->Release();
 
@@ -42,15 +48,9 @@ bool CApplication::init()
 	if (!CDevice::GetInstance()->Init(hWnd)) return false;
 	if (!CXFile::GetInstance()->Init()) return false;
 
-	D3DXMATRIX mat_proj, mat_view;
-
-	// builds a left-handed perspective projection matrix based on a field of view
+	D3DXMATRIX mat_proj, mat_view;	
 	D3DXMatrixPerspectiveFovLH(&mat_proj, D3DX_PI / 4.0, 1.33333, 1.0, 1000.0);
-
-	// sets a single device transformation-related state
 	g_Device->SetTransform(D3DTS_PROJECTION, &mat_proj);
-
-	// create and set the view matrix
 	D3DXMatrixLookAtLH(&mat_view,
 		&D3DXVECTOR3(0.0, 0.0, -10.0),
 		&D3DXVECTOR3(0.0, 0.0, 0.0),
@@ -59,8 +59,9 @@ bool CApplication::init()
 	g_Device->SetTransform(D3DTS_VIEW, &mat_view);
 
 	CXParser temp;
-	_frame = temp.parseXFile("../../media/mesh/tiger.x");
+	temp.parse("../../media/mesh/tiger.x");
 
+	_gameObject->_mesh = _meshes.find(_T("tiger.x"))->second;
 	return true;
 }
 
@@ -107,7 +108,7 @@ void CApplication::draw()
 		g_Device->SetTransform(D3DTS_WORLD, &mat_world);
 
 		// draw frames
-		DrawFrame(_frame);
+		DrawFrame(_gameObject);
 
 		// end the scene
 		g_Device->EndScene();
@@ -120,7 +121,7 @@ void CApplication::draw()
 	g_Device->SetTexture(0, NULL);
 }
 
-void CApplication::DrawFrame(FRAME* frame)
+void CApplication::DrawFrame(CGameObject* frame)
 {
 	MESH* mesh;
 	D3DXMATRIX* matrices = NULL;
@@ -134,58 +135,54 @@ void CApplication::DrawFrame(FRAME* frame)
 	if ((mesh = frame->_mesh) != NULL)
 	{
 		// setup pointer to mesh to draw
-		mesh_to_draw = mesh->_mesh;
+		mesh_to_draw = mesh->_meshData->pMesh;
 
 		// generate mesh from skinned mesh to draw with
-		if (mesh->_skinmesh != NULL && mesh->_skininfo != NULL)
-		{
-			DWORD num_bones = mesh->_skininfo->GetNumBones();
+		//if (mesh->_skinmesh != NULL && mesh->_skininfo != NULL)
+		//{
+		//	DWORD num_bones = mesh->_skininfo->GetNumBones();
 
-			// allocate an array of matrices to orient bones
-			matrices = new D3DXMATRIX[num_bones];
+		//	// allocate an array of matrices to orient bones
+		//	matrices = new D3DXMATRIX[num_bones];
 
-			// set all bones orientation to identity
-			for (DWORD i = 0; i < num_bones; i++)
-				D3DXMatrixIdentity(&matrices[i]);
+		//	// set all bones orientation to identity
+		//	for (DWORD i = 0; i < num_bones; i++)
+		//		D3DXMatrixIdentity(&matrices[i]);
 
-			// lock source and destination vertex buffers
+		//	// lock source and destination vertex buffers
 
-			void* source = NULL;
-			void* dest = NULL;
+		//	void* source = NULL;
+		//	void* dest = NULL;
 
-			// locks a vertex buffer and obtains a pointer to the vertex buffer memory
-			mesh->_mesh->LockVertexBuffer(0, &source);
-			mesh->_skinmesh->LockVertexBuffer(0, &dest);
+		//	// locks a vertex buffer and obtains a pointer to the vertex buffer memory
+		//	mesh->_mesh->LockVertexBuffer(0, &source);
+		//	mesh->_skinmesh->LockVertexBuffer(0, &dest);
 
-			// update skinned mesh, applies software skinning to the target vertices based on the current matrices.
-			mesh->_skininfo->UpdateSkinnedMesh(matrices, NULL, source, dest);
+		//	// update skinned mesh, applies software skinning to the target vertices based on the current matrices.
+		//	mesh->_skininfo->UpdateSkinnedMesh(matrices, NULL, source, dest);
 
-			// unlock buffers
-			mesh->_skinmesh->UnlockVertexBuffer();
-			mesh->_mesh->UnlockVertexBuffer();
+		//	// unlock buffers
+		//	mesh->_skinmesh->UnlockVertexBuffer();
+		//	mesh->_mesh->UnlockVertexBuffer();
 
-			// point to skin mesh to draw
-			mesh_to_draw = mesh->_skinmesh;
-		}
+		//	// point to skin mesh to draw
+		//	mesh_to_draw = mesh->_skinmesh;
+		//}
 
 		// render the mesh
 		for (DWORD i = 0; i < mesh->_numMaterials; i++)
 		{
-			// set the materials properties for the device
-			g_Device->SetMaterial(&mesh->_materials[i]);
+			g_Device->SetMaterial(&mesh->_materials[i]._matD3D);
 
-			// assigns a texture to a stage for a device
-			g_Device->SetTexture(0, mesh->_textures[i]);
+			g_Device->SetTexture(0, mesh->_materials[i]._texture);
 
-			// draw a subset of a mesh
 			mesh_to_draw->DrawSubset(i);
 		}
 
-		// free array of matrices
 		delete[] matrices;
 		matrices = NULL;
 	}
 
 	// draw child frames, recursively call.
-	DrawFrame(frame->_child);
+	//DrawFrame(frame->_child);
 }

@@ -11,8 +11,8 @@ private:
 	CWindowManager *_wndManager;
 
 	//Test
-	FRAME *_frame;
-	void DrawFrame(FRAME* frame);
+	CGameObject *_gameObject;
+	void DrawFrame(CGameObject* obj);
 
 private:
 	
@@ -29,6 +29,6 @@ public:
 	void go();
 
 	
-
+	static std::map<tstring, MESH *> _meshes;
 };
 

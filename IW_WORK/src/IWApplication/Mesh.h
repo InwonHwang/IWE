@@ -1,80 +1,79 @@
 #pragma once
 #include "stdafx.h"
 
-typedef struct MESH
+class MATERIAL
 {
-	char*               _name;             // name of mesh
+public:
+	D3DMATERIAL9 _matD3D;
+	IDirect3DTexture9* _texture;
 
-	ID3DXMesh*          _mesh;             // mesh object
-	ID3DXMesh*          _skinmesh;         // skin mesh object
-	ID3DXSkinInfo*      _skininfo;         // skin information
-
-	DWORD               _numMaterials;    // number of materails in mesh
-	D3DMATERIAL9*       _materials;        // array of materials
-	IDirect3DTexture9** _textures;         // array of textures    
-
-											// clear all structure data
-	MESH()
+public:
+	MATERIAL() : _texture(NULL) {}
+	~MATERIAL()
 	{
-		_name = NULL;
-
-		_mesh = NULL;
-		_skinmesh = NULL;
-		_skininfo = NULL;
-
-		_numMaterials = 0;
-		_materials = NULL;
-		_textures = NULL;
+		RELEASE_COM(_texture);
 	}
 
-	// free all used resources
+};
+
+class MESH
+{
+public:
+	char*               _name;
+	D3DXMESHDATA*      _meshData;
+
+	DWORD           _numMaterials;
+	MATERIAL*       _materials;
+
+public:
+	MESH() : _name(NULL), _meshData(NULL), _materials(NULL), _numMaterials(0)
+	{
+		_meshData = new D3DXMESHDATA();
+	}
 	~MESH()
 	{
-		delete[] _name;
-		_name = NULL;
-
-		RELEASE_COM(_mesh);
-		RELEASE_COM(_skinmesh);
-		RELEASE_COM(_skininfo);
-
-		delete[] _materials;
-		_materials = NULL;
-
-		// release all textures resource
-		if (_textures != NULL)
-		{
-			for (DWORD i = 0; i < _numMaterials; i++)
-				RELEASE_COM(_textures[i]);
-
-			delete[] _textures;
-			_textures = NULL;
-		}
+		RELEASE_COM(_meshData->pMesh);
+		RELEASE_COM(_meshData->pPatchMesh);
+		RELEASE_COM(_meshData->pPMesh);
+		SAFE_DELETE(_meshData);
+		SAFE_DELETE_ARRAY(_name);
+		SAFE_DELETE_ARRAY(_materials);		
 	}
 
-} MESH;
+};
 
-
-typedef struct FRAME
+class CGameObject
 {
-	char*   _name;     // frame's name
-	MESH*   _mesh;     // linked list of meshes    
-	FRAME*  _child;    // child frame
+public :
+	char * _name;
+	MESH * _mesh;
 
-	FRAME()
+	CGameObject() : _name(NULL), _mesh(NULL)
 	{
-		// clear all data
-		_name = NULL;
-		_mesh = NULL;
-		_child = NULL;
+	}
+	~CGameObject()
+	{
+		SAFE_DELETE_ARRAY(_name);
+		SAFE_DELETE(_mesh);
+	}
+};
+
+class FRAME
+{
+public:
+	char*   _name;
+	MESH*   _mesh;
+	FRAME*  _child;
+
+	FRAME() : _name(NULL), _mesh(NULL), _child(NULL)
+	{
 	}
 
 	~FRAME()
 	{
-		// delete all used resources, including linked list of frames.
-		delete[] _name;    _name = NULL;
-		delete _mesh;      _mesh = NULL;
-		delete _child;     _child = NULL;
+		SAFE_DELETE_ARRAY(_name);
+		SAFE_DELETE(_mesh);
+		SAFE_DELETE(_child);
 	}
-
-} FRAME;
+};
 
