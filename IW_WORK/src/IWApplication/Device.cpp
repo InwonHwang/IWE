@@ -58,6 +58,10 @@ bool CDevice::initD3D()
 
 	if (!_D3DDevice) return false;
 
+	_D3DDevice->SetRenderState(D3DRS_LIGHTING, TRUE);    // turn on the 3D lighting
+	_D3DDevice->SetRenderState(D3DRS_ZENABLE, TRUE);    // turn on the z-buffer
+	_D3DDevice->SetRenderState(D3DRS_AMBIENT, D3DCOLOR_XRGB(200, 200, 200));    // ambient light
+
 	return true;
 }
 

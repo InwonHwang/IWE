@@ -22,22 +22,24 @@
     <ClCompile Include="Application.cpp" />
     <ClCompile Include="Device.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="MeshParser.cpp" />
     <ClCompile Include="myrmxftmpl.cpp" />
-    <ClCompile Include="ParsingTest.cpp" />
+    <ClCompile Include="SkinnedMeshParser.cpp" />
     <ClCompile Include="stdafx.cpp" />
     <ClCompile Include="WindowManager.cpp" />
     <ClCompile Include="XFile.cpp" />
-    <ClCompile Include="XFileManager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Application.h" />
     <ClInclude Include="Device.h" />
+    <ClInclude Include="IXParser.h" />
+    <ClInclude Include="Mesh.h" />
+    <ClInclude Include="MeshParser.h" />
     <ClInclude Include="myrmxftmpl.h" />
-    <ClInclude Include="ParsingTest.h" />
+    <ClInclude Include="SkinnedMeshParser.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="WindowManager.h" />
     <ClInclude Include="XFile.h" />
-    <ClInclude Include="XFileManager.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{250104E9-7B1F-432B-AE24-765D43B17C49}</ProjectGuid>

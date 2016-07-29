@@ -1,6 +1,12 @@
 #pragma once
 #include "stdafx.h"
 
+class CMesh;
+class CSkinnedMesh;
+class CTransform;
+class CGameObject;
+class MATERIAL;
+
 class MATERIAL
 {
 public:
@@ -16,40 +22,94 @@ public:
 
 };
 
-class MESH
+class CSkinnedMesh
 {
 public:
-	char*               _name;
-	D3DXMESHDATA*      _meshData;
+	char*				 _name;
+	D3DXMESHDATA*		 _pMeshData;
+	DWORD*				 _pAdjacency;
+	LPD3DXEFFECTINSTANCE _pEffects;
+	LPD3DXSKININFO		 _pSkinInfo;
+	MATERIAL*			 _materials;
+	DWORD				 _numMaterials;
+
+	CSkinnedMesh*		 _pNext;	
+public:	
+	CSkinnedMesh() : _name(nullptr), _pMeshData(nullptr), _pAdjacency(nullptr), _pEffects(nullptr), _pNext(nullptr), _pSkinInfo(nullptr), _materials(nullptr), _numMaterials(0)
+	{	
+		_pMeshData = new D3DXMESHDATA();
+	}
+
+	~CSkinnedMesh()
+	{
+		RELEASE_COM(_pSkinInfo);
+		RELEASE_COM(_pMeshData->pMesh);
+		RELEASE_COM(_pMeshData->pPatchMesh);
+		RELEASE_COM(_pMeshData->pPMesh);		
+		SAFE_DELETE(_pMeshData);
+		SAFE_DELETE(_pAdjacency);
+		SAFE_DELETE_ARRAY(_name);
+		SAFE_DELETE_ARRAY(_materials);		
+	}
+};
+
+class CMesh
+{
+public:
+	char*				 _name;
+	D3DXMESHDATA*		 _pMeshData;
+	DWORD*				 _pAdjacency;
+	LPD3DXEFFECTINSTANCE _pEffects;
 
 	DWORD           _numMaterials;
 	MATERIAL*       _materials;
 
+	CMesh*			_pNext;
 public:
-	MESH() : _name(NULL), _meshData(NULL), _materials(NULL), _numMaterials(0)
+	CMesh() : _name(nullptr), _pMeshData(nullptr), _pAdjacency(nullptr), _pEffects(nullptr), _materials(nullptr), _pNext(NULL), _numMaterials(0)
 	{
-		_meshData = new D3DXMESHDATA();
+		_pMeshData = new D3DXMESHDATA();		
 	}
-	~MESH()
+	~CMesh()
 	{
-		RELEASE_COM(_meshData->pMesh);
-		RELEASE_COM(_meshData->pPatchMesh);
-		RELEASE_COM(_meshData->pPMesh);
-		SAFE_DELETE(_meshData);
+		RELEASE_COM(_pMeshData->pMesh);
+		RELEASE_COM(_pMeshData->pPatchMesh);
+		RELEASE_COM(_pMeshData->pPMesh);		
+		SAFE_DELETE(_pMeshData);
+		SAFE_DELETE(_pAdjacency);
 		SAFE_DELETE_ARRAY(_name);
 		SAFE_DELETE_ARRAY(_materials);		
 	}
 
 };
 
+class CTransform
+{
+public:
+	CGameObject *_gameOBject;	
+	CTransform *_parent;
+	std::list<CTransform *> _children;
+	D3DXMATRIX _matrix;
+	
+public:
+	CTransform() : _parent(NULL){}
+	~CTransform()
+	{
+		_children.clear();
+	}
+};
+
 class CGameObject
 {
-public :
+public:
 	char * _name;
-	MESH * _mesh;
+	CMesh * _mesh;
+	CTransform transform;
 
+public :
 	CGameObject() : _name(NULL), _mesh(NULL)
-	{
+	{		
+		transform._gameOBject = this;		
 	}
 	~CGameObject()
 	{
@@ -57,23 +117,3 @@ public :
 		SAFE_DELETE(_mesh);
 	}
 };
-
-class FRAME
-{
-public:
-	char*   _name;
-	MESH*   _mesh;
-	FRAME*  _child;
-
-	FRAME() : _name(NULL), _mesh(NULL), _child(NULL)
-	{
-	}
-
-	~FRAME()
-	{
-		SAFE_DELETE_ARRAY(_name);
-		SAFE_DELETE(_mesh);
-		SAFE_DELETE(_child);
-	}
-};
-

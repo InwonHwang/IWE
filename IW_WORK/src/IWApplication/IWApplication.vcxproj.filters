@@ -5,20 +5,37 @@
     <ClCompile Include="Device.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="stdafx.cpp" />
-    <ClCompile Include="XFileManager.cpp" />
     <ClCompile Include="WindowManager.cpp" />
     <ClCompile Include="XFile.cpp" />
-    <ClCompile Include="ParsingTest.cpp" />
     <ClCompile Include="myrmxftmpl.cpp" />
+    <ClCompile Include="MeshParser.cpp">
+      <Filter>Parser</Filter>
+    </ClCompile>
+    <ClCompile Include="SkinnedMeshParser.cpp">
+      <Filter>Parser</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Application.h" />
     <ClInclude Include="Device.h" />
     <ClInclude Include="stdafx.h" />
-    <ClInclude Include="XFileManager.h" />
     <ClInclude Include="WindowManager.h" />
     <ClInclude Include="XFile.h" />
-    <ClInclude Include="ParsingTest.h" />
     <ClInclude Include="myrmxftmpl.h" />
+    <ClInclude Include="Mesh.h" />
+    <ClInclude Include="IXParser.h">
+      <Filter>Parser</Filter>
+    </ClInclude>
+    <ClInclude Include="MeshParser.h">
+      <Filter>Parser</Filter>
+    </ClInclude>
+    <ClInclude Include="SkinnedMeshParser.h">
+      <Filter>Parser</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Parser">
+      <UniqueIdentifier>{ea1d5d9d-5583-47f7-a453-5452db200b8c}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
 </Project>

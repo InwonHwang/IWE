@@ -11,8 +11,10 @@ private:
 	CWindowManager *_wndManager;
 
 	//Test
-	CGameObject *_gameObject;
-	void DrawFrame(CGameObject* obj);
+	CMesh *_mesh;
+	CSkinnedMesh *_mesh2;
+	void DrawFrame(CMesh* mesh);
+	void DrawFrame2(CSkinnedMesh* mesh);
 
 private:
 	
@@ -27,8 +29,5 @@ public:
 	void frame();
 	void shutDown();
 	void go();
-
-	
-	static std::map<tstring, MESH *> _meshes;
 };
 
