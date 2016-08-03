@@ -1,21 +1,16 @@
 #pragma once
 #include "stdafx.h"
-#include "Mesh.h"
 
 class CWindowManager;
+class Mesh;
 
 
 class CApplication
 {
 private:
 	CWindowManager *_wndManager;
-
-	//Test
-	CMesh *_mesh;
-	CSkinnedMesh *_mesh2;
-	void DrawFrame(CMesh* mesh);
-	void DrawFrame2(CSkinnedMesh* mesh);
-
+		
+	void DrawFrame(Mesh* mesh);
 private:
 	
 	void update();
@@ -24,6 +19,9 @@ private:
 public:
 	CApplication();
 	~CApplication();
+
+	//test
+	
 
 	bool init();
 	void frame();

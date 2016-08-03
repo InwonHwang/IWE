@@ -2,27 +2,9 @@
 #include "WindowManager.h"
 #include "Device.h"
 #include "XFile.h"
-#include "MeshParser.h"
-#include "SkinnedMeshParser.h"
-
-
-void clearMesh(CMesh *mesh)
-{
-	CMesh * next = mesh->_pNext;
-	if (next)
-		clearMesh(next);
-
-	SAFE_DELETE(mesh);
-}
-
-void clearSkinnedMesh(CSkinnedMesh *skinnedMesh)
-{
-	CSkinnedMesh * next = skinnedMesh->_pNext;
-	if (next)
-		clearSkinnedMesh(next);
-
-	SAFE_DELETE(skinnedMesh);
-}
+#include "IWEMesh.h"
+#include "IWEMaterial.h"
+#include "IWEXFileParser.h"
 
 CApplication::CApplication()
 {
@@ -30,8 +12,6 @@ CApplication::CApplication()
 
 CApplication::~CApplication()
 {
-	clearMesh(_mesh);
-	clearSkinnedMesh(_mesh2);
 	shutDown();
 }
 
@@ -70,12 +50,6 @@ bool CApplication::init()
 
 	g_Device->SetTransform(D3DTS_VIEW, &mat_view);
 
-	CMeshParser temp;
-	_mesh = temp.parse("../../media/mesh/TF.x");
-
-	CSkinnedMeshParser temp2;
-	_mesh2 = temp2.parse("../../media/mesh/AV.x");
-
 	return true;
 }
 
@@ -98,80 +72,22 @@ void CApplication::update()
 void CApplication::draw()
 {
 	D3DXMATRIX mat_world;
-
 	g_Device->Clear(0, NULL, D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER, D3DCOLOR_RGBA(0, 64, 128, 255), 1.0f, 0);
 
 	if (SUCCEEDED(g_Device->BeginScene()))
 	{
 		D3DXMatrixRotationY(&mat_world, 0);
 
-		g_Device->SetTransform(D3DTS_WORLD, &mat_world);
-
-		DrawFrame2(_mesh2);
-		DrawFrame(_mesh);
+		g_Device->SetTransform(D3DTS_WORLD, &mat_world);		
 
 		g_Device->EndScene();
 	}
 
 	g_Device->Present(NULL, NULL, NULL, NULL);
-
 	g_Device->SetTexture(0, NULL);
 }
 
-void CApplication::DrawFrame2(CSkinnedMesh* skinnedMesh)
-{
-	D3DXMATRIX* matrices = NULL;
-	if (skinnedMesh)
-	{
-		//if (skinnedMesh->_pSkinInfo != NULL)
-		//{
-		//	DWORD num_bones = skinnedMesh->_pSkinInfo->GetNumBones();
-
-		//	// allocate an array of matrices to orient bones
-		//	matrices = new D3DXMATRIX[num_bones];
-
-		//	// set all bones orientation to identity
-		//	for (DWORD i = 0; i < num_bones; i++)
-		//		D3DXMatrixIdentity(&matrices[i]);
-
-		//	// lock source and destination vertex buffers
-
-		//	void* source = NULL;
-		//	void* dest = NULL;
-
-		//	// locks a vertex buffer and obtains a pointer to the vertex buffer memory
-		//	mesh->m_mesh->LockVertexBuffer(0, &source);
-		//	mesh->m_skinmesh->LockVertexBuffer(0, &dest);
-
-		//	// update skinned mesh, applies software skinning to the target vertices based on the current matrices.
-		//	mesh->m_skininfo->UpdateSkinnedMesh(matrices, NULL, source, dest);
-
-		//	// unlock buffers
-		//	mesh->m_skinmesh->UnlockVertexBuffer();
-		//	mesh->m_mesh->UnlockVertexBuffer();
-
-		//	// point to skin mesh to draw
-		//	mesh_to_draw = mesh->m_skinmesh;
-		//}		
-
-		// free array of matrices
-		/*delete[] matrices;
-		matrices = NULL;*/
-
-		for (DWORD i = 0; i < skinnedMesh->_numMaterials; i++)
-		{
-			g_Device->SetMaterial(&skinnedMesh->_materials[i]._matD3D);
-
-			g_Device->SetTexture(0, skinnedMesh->_materials[i]._texture);
-
-			skinnedMesh->_pMeshData->pMesh->DrawSubset(i);
-		}
-
-		DrawFrame2(skinnedMesh->_pNext);
-	}
-}
-
-void CApplication::DrawFrame(CMesh* mesh)
+void CApplication::DrawFrame(Mesh* mesh)
 {
 	if (mesh)
 	{
@@ -184,6 +100,5 @@ void CApplication::DrawFrame(CMesh* mesh)
 			mesh->_pMeshData->pMesh->DrawSubset(i);
 		}
 
-		DrawFrame(mesh->_pNext);
 	}
 }

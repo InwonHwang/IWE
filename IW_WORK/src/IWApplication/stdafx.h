@@ -11,6 +11,7 @@
 #include <map>
 #include <list>
 #include <rmxfguid.h>
+#include <memory>
 #include "myrmxftmpl.h"
 
 typedef std::basic_string<TCHAR> tstring;
