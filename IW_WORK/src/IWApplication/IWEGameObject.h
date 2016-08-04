@@ -12,7 +12,6 @@ public:
 	Mesh * mesh;
 	Transform * transform;
 
-	
 public:
 	GameObject();
 	~GameObject();

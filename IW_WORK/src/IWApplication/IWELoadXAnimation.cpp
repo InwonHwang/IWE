@@ -31,9 +31,6 @@ bool LoadXAnimation::loadData(LPD3DXFILEDATA pXFileData, void ** ppData)
 	DWORD keyType = ((DWORD*)buffer)[0];
 	DWORD keyCount = ((DWORD*)buffer)[1];
 
-	DebugBox(keyType, "keyType");
-	DebugBox(keyCount, "keyCount");
-
 	if (keyType == 0)
 	{
 		std::list<ROTATIONKEY *> *rotList = new std::list<ROTATIONKEY *>();
@@ -47,8 +44,6 @@ bool LoadXAnimation::loadData(LPD3DXFILEDATA pXFileData, void ** ppData)
 		}
 
 		_animation.reset(new Animation(rotList));
-
-		delete rotList;
 	}
 
 	if (keyType == 1)
@@ -65,8 +60,6 @@ bool LoadXAnimation::loadData(LPD3DXFILEDATA pXFileData, void ** ppData)
 		}
 
 		_animation.reset(new Animation(scaleList));
-
-		delete scaleList;
 	}
 
 	else if (keyType == 2)
@@ -83,8 +76,6 @@ bool LoadXAnimation::loadData(LPD3DXFILEDATA pXFileData, void ** ppData)
 		}
 
 		_animation.reset(new Animation(posList));
-
-		delete posList;
 	}
 	else if (keyType == 4)
 	{
@@ -109,10 +100,6 @@ bool LoadXAnimation::loadData(LPD3DXFILEDATA pXFileData, void ** ppData)
 		}
 
 		_animation.reset(new Animation(posList, rotList, scaleList));
-
-		delete posList;
-		delete rotList;
-		delete scaleList;
 	}	
 	pXFileData->Unlock();
 

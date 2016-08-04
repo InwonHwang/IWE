@@ -2,6 +2,7 @@
 #include "stdafx.h"
 
 class CWindowManager;
+class GameObject;
 class Mesh;
 
 
@@ -9,19 +10,19 @@ class CApplication
 {
 private:
 	CWindowManager *_wndManager;
-		
-	void DrawFrame(Mesh* mesh);
-private:
+	GameObject *_root;
+
 	
+private:	
 	void update();
 	void draw();
+	void DrawFrame(Mesh* mesh);
+	void DrawFrame2(GameObject* gameObject);
 
 public:
 	CApplication();
 	~CApplication();
-
-	//test
-	
+		
 
 	bool init();
 	void frame();

@@ -5,6 +5,18 @@
 #include "IWEMesh.h"
 #include "IWEMaterial.h"
 #include "IWEXFileParser.h"
+#include "IWEGameObject.h"
+#include "IWETransform.h"
+
+void Clear(GameObject *gameObject)
+{
+	for (std::list<Transform *>::iterator it = gameObject->transform->_children.begin(); it != gameObject->transform->_children.end(); it++)
+	{		
+		if ((*it)->_gameObject)
+			Clear((*it)->_gameObject);
+	}
+	SAFE_DELETE(gameObject);
+}
 
 CApplication::CApplication()
 {
@@ -17,6 +29,7 @@ CApplication::~CApplication()
 
 void CApplication::shutDown()
 {
+	Clear(_root);
 	CDevice::GetInstance()->Release();
 	CXFile::GetInstance()->Release();
 
@@ -44,11 +57,14 @@ bool CApplication::init()
 	D3DXMatrixPerspectiveFovLH(&mat_proj, D3DX_PI / 4.0f, 1.33333f, 1.0f, 1000.0f);
 	g_Device->SetTransform(D3DTS_PROJECTION, &mat_proj);
 	D3DXMatrixLookAtLH(&mat_view,
-		&D3DXVECTOR3(500.0, 500.0, -500.0),
+		&D3DXVECTOR3(500.0, 500.0, -500.0),		
 		&D3DXVECTOR3(0.0, 0.0, 0.0),
 		&D3DXVECTOR3(0.0, 1.0, 0.0));
 
 	g_Device->SetTransform(D3DTS_VIEW, &mat_view);
+
+	XFileParser temp;
+	_root = temp.parse("../../media/mesh/AV.x");
 
 	return true;
 }
@@ -80,6 +96,11 @@ void CApplication::draw()
 
 		g_Device->SetTransform(D3DTS_WORLD, &mat_world);		
 
+		if (_root)
+		{
+			DrawFrame2(_root);
+		}
+
 		g_Device->EndScene();
 	}
 
@@ -100,5 +121,30 @@ void CApplication::DrawFrame(Mesh* mesh)
 			mesh->_pMeshData->pMesh->DrawSubset(i);
 		}
 
+	}
+}
+
+void CApplication::DrawFrame2(GameObject* gameObject)
+{
+	if (!gameObject) return;
+
+	Mesh *tmpMesh = gameObject->mesh;
+
+	if (tmpMesh)
+	{
+		for (DWORD i = 0; i < tmpMesh->_numMaterials; i++)
+		{
+			g_Device->SetMaterial(&tmpMesh->_materials[i]._matD3D);
+
+			g_Device->SetTexture(0, tmpMesh->_materials[i]._texture);
+
+			tmpMesh->_pMeshData->pMesh->DrawSubset(i);
+		}
+	}
+
+	for (std::list<Transform *>::iterator it = gameObject->transform->_children.begin(); it != gameObject->transform->_children.end(); it++)
+	{
+		if((*it)->_gameObject)
+			DrawFrame2((*it)->_gameObject);
 	}
 }

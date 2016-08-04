@@ -38,6 +38,18 @@ Animation::Animation()
 
 Animation::~Animation()
 {	
+	for (std::list<POSITIONKEY *>::iterator it = _positionKey->begin(); it != _positionKey->end(); it++)	
+		SAFE_DELETE((*it));
+	_positionKey->clear();
+	
+	for (std::list<ROTATIONKEY *>::iterator it = _rotationKey->begin(); it != _rotationKey->end(); it++)
+		SAFE_DELETE((*it));
+	_rotationKey->clear();
+
+	for (std::list<SCALEKEY *>::iterator it = _scaleKey->begin(); it != _scaleKey->end(); it++)
+		SAFE_DELETE((*it));
+	_scaleKey->clear();
+
 	SAFE_DELETE(_positionKey);
 	SAFE_DELETE(_rotationKey);
 	SAFE_DELETE(_scaleKey);

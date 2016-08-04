@@ -7,9 +7,11 @@ AnimationSet::AnimationSet()
 {
 }
 
-
 AnimationSet::~AnimationSet()
 {
+	for (std::list<Animation *>::iterator it = _animation.begin(); it != _animation.end(); it++)
+		SAFE_DELETE((*it));
+	_animation.clear();
 }
 
 DWORD AnimationSet::getFrameTime()
