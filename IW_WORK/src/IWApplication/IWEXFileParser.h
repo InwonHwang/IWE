@@ -1,9 +1,9 @@
 #pragma once
 #include "stdafx.h"
 
-class LoadXMesh;
-class LoadXAnimation;
-class LoadXTransformMatrix;
+class XMeshParser;
+class XAnimationParser;
+class XTransformMatrixParser;
 class AnimationSet;
 class Mesh;
 class Transform;
@@ -15,9 +15,9 @@ private:
 	std::list<AnimationSet *> _animationSets;
 	GameObject* _root;
 
-	LoadXMesh *loaderMesh;
-	LoadXAnimation *loaderAnimation;
-	LoadXTransformMatrix *loaderFrame;
+	XMeshParser *meshParser;
+	XAnimationParser *animationParser;
+	XTransformMatrixParser *loaderMatrix;
 
 private:
 	HRESULT getGUID(LPD3DXFILEDATA pXFileData, GUID *guid);
@@ -39,9 +39,9 @@ public:
 		parseXFile(fileName);
 		return _root;
 	}
-	DWORD getCount()
+	AnimationSet* getAnimSet()
 	{
-		return _animationSets.size();
+		return *(_animationSets.begin());
 	}
 };
 

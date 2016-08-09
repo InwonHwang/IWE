@@ -6,6 +6,7 @@ class AnimationKey;
 
 struct POSITIONKEY {
 	DWORD Time;
+	DWORD Count;
 	D3DXVECTOR3 Position;
 
 	POSITIONKEY(DWORD time, D3DXVECTOR3 pos)
@@ -17,6 +18,7 @@ struct POSITIONKEY {
 
 struct ROTATIONKEY {
 	DWORD Time;
+	DWORD Count;
 	D3DXQUATERNION Rotation;
 	ROTATIONKEY(DWORD time, D3DXQUATERNION rotation)
 	{
@@ -27,6 +29,7 @@ struct ROTATIONKEY {
 
 struct MATRIXKEY {
 	DWORD Time;
+	DWORD Count;
 	D3DXMATRIX Matrix;
 	MATRIXKEY(DWORD time, D3DXMATRIX matrix)
 	{
@@ -37,6 +40,7 @@ struct MATRIXKEY {
 
 struct SCALEKEY {
 	DWORD Time;
+	DWORD Count;
 	D3DXVECTOR3 Scale;
 	SCALEKEY(DWORD time, D3DXVECTOR3 scale)
 	{
@@ -48,12 +52,12 @@ struct SCALEKEY {
 class Animation
 {
 private:
-	std::list<POSITIONKEY*> *_positionKey;
+	/*std::list<POSITIONKEY*> *_positionKey;
 	std::list<ROTATIONKEY*> *_rotationKey;
-	std::list<SCALEKEY*>	*_scaleKey;
+	std::list<SCALEKEY*>	*_scaleKey;*/
 		
 	Transform * _bone;
-	char* _boneName;
+	//char* _boneName;
 	DWORD _length;
 	DWORD _frameTime;
 
@@ -62,13 +66,18 @@ public:
 	Animation(std::list<POSITIONKEY*> *);
 	Animation(std::list<ROTATIONKEY*> *);
 	Animation(std::list<SCALEKEY*> *);
-	Animation();	// LoadXAnimation로 생성하는것 이외에 사용자가 생성할 수 있도록, 그리고 직접 key를 추가할 수 있도록
+	Animation();
 	~Animation();
 
 	DWORD getFrameTime();
 	DWORD getLength();
 	void findBone(Transform *rootTransform);
-	void update();
+	void update(DWORD LocalTime);
+
+	char* _boneName;
+	std::list<POSITIONKEY*> *_positionKey;
+	std::list<ROTATIONKEY*> *_rotationKey;
+	std::list<SCALEKEY*>	*_scaleKey;
 };
 
 

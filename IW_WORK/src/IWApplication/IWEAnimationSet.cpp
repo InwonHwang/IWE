@@ -5,6 +5,7 @@ AnimationSet::AnimationSet()
 	: _frameTime(0),
 	_length(0)
 {
+	_animation.clear();
 }
 
 AnimationSet::~AnimationSet()
@@ -30,14 +31,17 @@ void AnimationSet::addAnimation( Animation * animation)
 }
 
 void AnimationSet::findBone(Transform *rootTransform)
-{
+{	
 	for (std::list<Animation *>::iterator it = _animation.begin(); it != _animation.end(); ++it)
 	{
 		(*it)->findBone(rootTransform);
 	}
 }
 
-void AnimationSet::update()
-{
-
+void AnimationSet::update(DWORD LocalTime)
+{	
+	for (std::list<Animation *>::iterator it = _animation.begin(); it != _animation.end(); ++it)
+	{
+		(*it)->update(LocalTime);
+	}
 }

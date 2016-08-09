@@ -5,14 +5,10 @@
 #include <d3d9.h>
 #include <d3dx9.h>
 #include <DxErr.h>
-#include <dxfile.h>
 #include <tchar.h>
 #include <string>
-#include <map>
-#include <list>
-#include <rmxfguid.h>
-#include <memory>
-#include "myrmxftmpl.h"
+
+
 
 typedef std::basic_string<TCHAR> tstring;
 

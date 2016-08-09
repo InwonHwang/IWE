@@ -7,6 +7,8 @@
 #include "IWEXFileParser.h"
 #include "IWEGameObject.h"
 #include "IWETransform.h"
+#include "IWEAnimationSet.h"
+#include "IWEAnimation.h"
 
 void Clear(GameObject *gameObject)
 {
@@ -19,6 +21,7 @@ void Clear(GameObject *gameObject)
 }
 
 CApplication::CApplication()
+	: CWindowManager()
 {
 }
 
@@ -29,28 +32,24 @@ CApplication::~CApplication()
 
 void CApplication::shutDown()
 {
+	CWindowManager::shutDown();
 	Clear(_root);
+	
 	CDevice::GetInstance()->Release();
 	CXFile::GetInstance()->Release();
 
-	_wndManager->shutDown();
-	SAFE_DELETE(_wndManager);
 }
 
 bool CApplication::init()
 {
-	_wndManager = new CWindowManager();
-
-	WMHandle = _wndManager;
-	HWND hWnd = _wndManager->init(L"Test");
-
-	if (hWnd == NULL)
+	CWindowManager::init(L"Test");
+	
+	if (_hWnd == NULL)
 	{
-		SAFE_DELETE(_wndManager);
 		return false;
 	}
 
-	if (!CDevice::GetInstance()->Init(hWnd)) return false;
+	if (!CDevice::GetInstance()->Init(_hWnd)) return false;
 	if (!CXFile::GetInstance()->Init()) return false;
 
 	D3DXMATRIX mat_proj, mat_view;	
@@ -64,14 +63,16 @@ bool CApplication::init()
 	g_Device->SetTransform(D3DTS_VIEW, &mat_view);
 
 	XFileParser temp;
-	_root = temp.parse("../../media/mesh/AV.x");
+	_root = temp.parse("../../media/mesh/tiny.x");
+	_animSet = temp.getAnimSet();
+	_animSet->findBone(_root->transform);
 
 	return true;
 }
 
 void CApplication::go()
 {
-	_wndManager->run(this);
+	run();
 }
 
 void CApplication::frame()
@@ -81,8 +82,19 @@ void CApplication::frame()
 }
 
 void CApplication::update()
-{
+{	
+	static DWORD Time = GetTickCount();
+	if (_animSet)
+	{
+		
 
+		_animSet->update((GetTickCount() % 4961));
+
+		//DebugBox((GetTickCount() % 4961), "time");
+
+		
+	}
+	Time = GetTickCount();
 }
 
 void CApplication::draw()
@@ -94,7 +106,8 @@ void CApplication::draw()
 	{
 		D3DXMatrixRotationY(&mat_world, 0);
 
-		g_Device->SetTransform(D3DTS_WORLD, &mat_world);		
+		g_Device->SetTransform(D3DTS_WORLD, &mat_world);
+		
 
 		if (_root)
 		{
@@ -108,22 +121,6 @@ void CApplication::draw()
 	g_Device->SetTexture(0, NULL);
 }
 
-void CApplication::DrawFrame(Mesh* mesh)
-{
-	if (mesh)
-	{
-		for (DWORD i = 0; i < mesh->_numMaterials; i++)
-		{
-			g_Device->SetMaterial(&mesh->_materials[i]._matD3D);
-
-			g_Device->SetTexture(0, mesh->_materials[i]._texture);
-
-			mesh->_pMeshData->pMesh->DrawSubset(i);
-		}
-
-	}
-}
-
 void CApplication::DrawFrame2(GameObject* gameObject)
 {
 	if (!gameObject) return;
@@ -132,14 +129,9 @@ void CApplication::DrawFrame2(GameObject* gameObject)
 
 	if (tmpMesh)
 	{
-		for (DWORD i = 0; i < tmpMesh->_numMaterials; i++)
-		{
-			g_Device->SetMaterial(&tmpMesh->_materials[i]._matD3D);
-
-			g_Device->SetTexture(0, tmpMesh->_materials[i]._texture);
-
-			tmpMesh->_pMeshData->pMesh->DrawSubset(i);
-		}
+		if (!tmpMesh->_BoneMatrices) tmpMesh->findBone(_root->transform);
+		gameObject->transform->update();
+		tmpMesh->update();
 	}
 
 	for (std::list<Transform *>::iterator it = gameObject->transform->_children.begin(); it != gameObject->transform->_children.end(); it++)

@@ -1,31 +1,26 @@
-#include "IWELoadXAnimation.h"
+#include "IWEXAnimationParser.h"
 #include "IWEAnimation.h"
 
-LoadXAnimation::LoadXAnimation()
+XAnimationParser::XAnimationParser()
 	: _animation(nullptr)
 {
 }
 
-LoadXAnimation::~LoadXAnimation()
+XAnimationParser::~XAnimationParser()
 {
 	_animation.reset();
 }
 
-Animation* LoadXAnimation::getData()
-{
-	return _animation.release();
-}
-
-bool LoadXAnimation::loadData(LPD3DXFILEDATA pXFileData, void ** ppData)
+void XAnimationParser::loadAnimationKey(LPD3DXFILEDATA pXFileData, void ** ppData)
 {
 	BYTE* buffer = NULL;
-	DWORD size = 0;	
+	DWORD size = 0;
 	HRESULT hr = 0;
 
 	if (FAILED(hr = pXFileData->Lock(&size, (LPCVOID*)&buffer)))
 	{
 		DebugError(hr);
-		return false;
+		return ;
 	}
 
 	DWORD keyType = ((DWORD*)buffer)[0];
@@ -38,12 +33,12 @@ bool LoadXAnimation::loadData(LPD3DXFILEDATA pXFileData, void ** ppData)
 		for (DWORD Key = 0; Key < keyCount; Key++)
 		{
 			std::unique_ptr<ROTATIONKEY> tmpRotKey = std::make_unique<ROTATIONKEY>(rotKeys->Time, rotKeys->Rotation);
-			
+
 			rotList->push_back(tmpRotKey.release());
 			rotKeys++;
 		}
 
-		_animation.reset(new Animation(rotList));
+		_animation.get()->_rotationKey = rotList;
 	}
 
 	if (keyType == 1)
@@ -52,14 +47,14 @@ bool LoadXAnimation::loadData(LPD3DXFILEDATA pXFileData, void ** ppData)
 		SCALEKEY* scaleKey = (SCALEKEY*)(buffer + (sizeof(DWORD) * 2));
 		for (DWORD key = 0; key < keyCount; key++)
 		{
-			
+
 			std::unique_ptr<SCALEKEY> tmpScaleKey = std::make_unique<SCALEKEY>(scaleKey->Time, scaleKey->Scale);
 
 			scaleList->push_back(tmpScaleKey.release());
 			scaleKey++;
 		}
 
-		_animation.reset(new Animation(scaleList));
+		_animation.get()->_scaleKey = scaleList;
 	}
 
 	else if (keyType == 2)
@@ -68,14 +63,14 @@ bool LoadXAnimation::loadData(LPD3DXFILEDATA pXFileData, void ** ppData)
 		POSITIONKEY* posKeys = (POSITIONKEY*)(buffer + (sizeof(DWORD) * 2));
 		for (DWORD key = 0; key < keyCount; key++)
 		{
-			
+
 			std::unique_ptr<POSITIONKEY> tmpScaleKey = std::make_unique<POSITIONKEY>(posKeys->Time, posKeys->Position);
 
 			posList->push_back(tmpScaleKey.release());
 			posKeys++;
 		}
 
-		_animation.reset(new Animation(posList));
+		_animation->_positionKey = posList;
 	}
 	else if (keyType == 4)
 	{
@@ -99,9 +94,81 @@ bool LoadXAnimation::loadData(LPD3DXFILEDATA pXFileData, void ** ppData)
 			matrixKeys++;
 		}
 
-		_animation.reset(new Animation(posList, rotList, scaleList));
-	}	
+		_animation->_scaleKey = scaleList;
+		_animation->_rotationKey = rotList;
+		_animation->_positionKey = posList;
+	}
 	pXFileData->Unlock();
+}
+
+void XAnimationParser::loadAnimationOptions(LPD3DXFILEDATA pXFileData, void ** ppData)
+{
+
+	BYTE* buffer = NULL;
+	DWORD size = 0;
+	HRESULT hr = 0;
+
+	if (FAILED(hr = pXFileData->Lock(&size, (LPCVOID*)&buffer)))
+	{
+		DWORD OpenClosed = ((DWORD*)buffer)[0];
+		DWORD PositionQuality = ((DWORD*)buffer)[1];
+
+		//if (OpenClosed && ParentAnimSet) ParentAnimSet->m_Looping = true;	
+		pXFileData->Unlock();
+	}
+}
+void XAnimationParser::loadBoneName(LPD3DXFILEDATA pXFileData, void ** ppData)
+{	
+
+	getName(pXFileData, &(_animation->_boneName));	
+}
+
+Animation* XAnimationParser::getData(LPD3DXFILEDATA pXFileData, void ** ppData)
+{
+	parse(pXFileData, ppData);
+	return _animation.release();
+}
+
+bool XAnimationParser::parse(LPD3DXFILEDATA pXFileData, void ** ppData)
+{
+	HRESULT hr = 0;
+	SIZE_T childCount;
+	pXFileData->GetChildren(&childCount);
+	
+	_animation.reset();
+	_animation = std::make_unique<Animation>();
+	for (SIZE_T i = 0; i < childCount; i++)
+	{
+		LPD3DXFILEDATA pSubData;
+		if (FAILED(hr = pXFileData->GetChild(i, &pSubData)))
+			continue;
+
+		parseSub(pSubData, ppData);
+		RELEASE_COM(pSubData);
+	}
+
+	return true;
+}
+
+bool XAnimationParser::parseSub(LPD3DXFILEDATA pXFileData, void ** ppData)
+{
+	HRESULT hr = 0;
+	GUID type;
+
+	hr = getGUID(pXFileData, &type);
+	
+	if (type == TID_D3DRMAnimationKey)
+	{
+		loadAnimationKey(pXFileData, ppData);
+	}
+	else if (type == TID_D3DRMAnimationOptions)
+	{
+		loadAnimationOptions(pXFileData, ppData);
+	}
+	else
+	{
+		loadBoneName(pXFileData, ppData);
+	}
 
 	return true;
 }

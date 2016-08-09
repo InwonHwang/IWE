@@ -13,15 +13,14 @@ CWindowManager::~CWindowManager()
 {
 }
 
-HWND CWindowManager::init(LPCWSTR appName)
+void CWindowManager::init(LPCWSTR appName)
 {	
+	WMHandle = this;
 	_wndName = appName;
 	createWindow();	
-
-	return _hWnd;
 }
 
-void CWindowManager::run(CApplication *app)
+void CWindowManager::run()
 {
 	MSG msg;
 
@@ -36,7 +35,7 @@ void CWindowManager::run(CApplication *app)
 		if (msg.message == WM_QUIT)
 			break;
 		
-		if (app) app->frame();
+		frame();
 	}
 }
 

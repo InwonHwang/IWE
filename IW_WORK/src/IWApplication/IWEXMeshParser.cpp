@@ -1,25 +1,26 @@
-#include "IWELoadXMesh.h"
+#include "IWEXMeshParser.h"
 #include "IWEMaterial.h"
 #include "IWEMesh.h"
 #include "Device.h"
 
-LoadXMesh::LoadXMesh()
+XMeshParser::XMeshParser()
 	: _mesh(nullptr)
 {
 }
 
 
-LoadXMesh::~LoadXMesh()
+XMeshParser::~XMeshParser()
 {
 	_mesh.reset();
 }
 
-Mesh * LoadXMesh::getData()
+Mesh * XMeshParser::getData(LPD3DXFILEDATA pXFileData, void ** ppData)
 {
+	parse(pXFileData, ppData);
 	return _mesh.release();
 }
 
-bool LoadXMesh::loadData(LPD3DXFILEDATA pXFileData, void ** ppData)
+bool XMeshParser::parse(LPD3DXFILEDATA pXFileData, void ** ppData)
 {
 	HRESULT hr = 0;
 	LPD3DXBUFFER bufferMaterial = NULL;
@@ -33,6 +34,14 @@ bool LoadXMesh::loadData(LPD3DXFILEDATA pXFileData, void ** ppData)
 		DebugError(hr);
 		_mesh.reset();
 		return false;
+	}
+
+	if (_mesh.get()->_pSkinInfo && _mesh.get()->_pSkinInfo->GetNumBones() != 0)
+	{
+		if (FAILED(hr = _mesh.get()->_pMeshData->pMesh->CloneMeshFVF(0, _mesh.get()->_pMeshData->pMesh->GetFVF(), g_Device, &_mesh.get()->_pSkinnedMeshData->pMesh)))
+		{
+			DebugError(hr);
+		}
 	}
 
 	RELEASE_COM(adjacency)
@@ -66,5 +75,10 @@ bool LoadXMesh::loadData(LPD3DXFILEDATA pXFileData, void ** ppData)
 
 	RELEASE_COM(bufferMaterial);
 
+	return true;
+}
+
+bool XMeshParser::parseSub(LPD3DXFILEDATA pXFileData, void ** ppData)
+{
 	return true;
 }

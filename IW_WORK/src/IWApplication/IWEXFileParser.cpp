@@ -1,8 +1,8 @@
 #include "IWEXFileParser.h"
 #include "XFile.h"
-#include "IWELoadXMesh.h"
-#include "IWELoadXAnimation.h"
-#include "IWELoadXTransformMatrix.h"
+#include "IWEXMeshParser.h"
+#include "IWEXAnimationParser.h"
+#include "IWEXTransformMatrixParser.h"
 #include "IWEMesh.h"
 #include "IWEAnimation.h"
 #include "IWEAnimationSet.h"
@@ -10,26 +10,26 @@
 #include "IWEGameObject.h"
 
 XFileParser::XFileParser()
-	: loaderMesh(NULL),
-	loaderFrame(NULL),
-	loaderAnimation(NULL),
+	: meshParser(NULL),
+	loaderMatrix(NULL),
+	animationParser(NULL),
 	_root(NULL)
 {
-	loaderMesh = new LoadXMesh();
-	loaderAnimation = new LoadXAnimation();
-	loaderFrame = new LoadXTransformMatrix();
+	meshParser = new XMeshParser();
+	animationParser = new XAnimationParser();
+	loaderMatrix = new XTransformMatrixParser();
 }
 
 
 XFileParser::~XFileParser()
 {
-	for (std::list<AnimationSet *>::iterator it = _animationSets.begin(); it != _animationSets.end(); it++)
+	/*for (std::list<AnimationSet *>::iterator it = _animationSets.begin(); it != _animationSets.end(); it++)
 		SAFE_DELETE((*it));
-	_animationSets.clear();
+	_animationSets.clear();*/
 
-	SAFE_DELETE(loaderMesh);
-	SAFE_DELETE(loaderAnimation);
-	SAFE_DELETE(loaderFrame);
+	SAFE_DELETE(meshParser);
+	SAFE_DELETE(animationParser);
+	SAFE_DELETE(loaderMatrix);
 }
 
 HRESULT XFileParser::getGUID(LPD3DXFILEDATA pXFileData, GUID *guid)
@@ -60,6 +60,8 @@ HRESULT XFileParser::getName(LPD3DXFILEDATA pXFileData, char **name)
 
 		strcpy_s(*name, 10, "GameObject");
 	}
+
+	return hr;
 }
 
 void XFileParser::parseXFile(char* fileName)
@@ -101,7 +103,7 @@ void XFileParser::parseXFileData(LPD3DXFILEDATA pXFileData, void ** ppData)
 
 	hr = getGUID(pXFileData, &type);
 	
-
+	
 	if (type == TID_D3DRMFrame)
 	{
 		GameObject * newGameObject = new GameObject();
@@ -127,9 +129,9 @@ void XFileParser::parseXFileData(LPD3DXFILEDATA pXFileData, void ** ppData)
 	else if (type == TID_D3DRMAnimationSet)
 	{
 		AnimationSet * animSet = new AnimationSet();
-		_animationSets.push_back(animSet);
+		_animationSets.push_back(animSet);			
 	}
-	else if (type == TID_D3DRMAnimationKey)
+	else if (type == TID_D3DRMAnimation)
 	{
 		loadAnimation(pXFileData, ppData);
 	}
@@ -150,10 +152,8 @@ void XFileParser::parseXFileData(LPD3DXFILEDATA pXFileData, void ** ppData)
 
 void XFileParser::loadMesh(LPD3DXFILEDATA pXFileData, void **ppData)
 {	
-	Mesh *tmpMesh = NULL;
-	if (loaderMesh->loadData(pXFileData, ppData))
-		tmpMesh = loaderMesh->getData();
-
+	Mesh *tmpMesh = meshParser->getData(pXFileData, ppData);
+	
 	if (ppData && tmpMesh)
 	{
 		GameObject *tmpGameObject = *((GameObject **)ppData);					
@@ -166,27 +166,23 @@ void XFileParser::loadMesh(LPD3DXFILEDATA pXFileData, void **ppData)
 
 void XFileParser::loadAnimation(LPD3DXFILEDATA pXFileData, void **ppData)
 {
-	Animation * animation = NULL;
-	if (loaderAnimation->loadData(pXFileData, ppData))
-	{
-		animation = loaderAnimation->getData();
-		if(animation) _animationSets.back()->addAnimation(animation);
+	Animation * animation = animationParser->getData(pXFileData, ppData);
+
+	if (animation)
+	{	
+		_animationSets.back()->addAnimation(animation);
 	}		
 }
 
 void XFileParser::loadTransform(LPD3DXFILEDATA pXFileData, void **ppData)
 {
-	D3DXMATRIX *tmpMatrix = NULL;
-	if (loaderFrame->loadData(pXFileData, ppData))
-		tmpMatrix = loaderFrame->getData();
+	D3DXMATRIX tmpMatrix = loaderMatrix->getData(pXFileData, ppData);
 
 	if (ppData && tmpMatrix)
 	{
 		GameObject *tmpGameObject = *((GameObject **)ppData);
 		tmpGameObject->transform->_matrix = tmpMatrix;
 	}
-	else
-		SAFE_DELETE(tmpMatrix);
 }
 
 

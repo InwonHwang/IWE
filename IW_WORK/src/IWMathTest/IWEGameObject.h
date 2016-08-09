@@ -8,14 +8,11 @@ class GameObject
 {
 
 public:
-	char * name;
-	Mesh * mesh;
 	Transform * transform;
+	Mesh * mesh;
 
-	void update()
-	{
+	void update();
 
-	}
 
 public:
 	GameObject();

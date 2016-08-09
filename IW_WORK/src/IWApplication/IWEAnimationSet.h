@@ -20,6 +20,6 @@ public:
 	DWORD getLength();
 	void addAnimation(Animation * animation);
 	void findBone(Transform *rootTransform);
-	void update();
+	void update(DWORD LocalTime);
 };
 
