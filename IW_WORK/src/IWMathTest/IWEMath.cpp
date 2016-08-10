@@ -60,10 +60,6 @@ float IWEMath::Round(float f)
 {
 	return roundf(f);
 }
-int IWEMath::RountToInt(float f)
-{
-	return roundf(f);
-}
 
 float IWEMath::Exp(float f)
 {
@@ -73,20 +69,12 @@ float IWEMath::Floor(float f)
 {
 	return floorf(f);
 }
-int IWEMath::FloorToInt(float f)
-{
-	return floorf(f);
-}
 
 float IWEMath::Ceil(float f)
 {
 	return ceilf(f);
 }
 
-int IWEMath::CeilToInt(float f)
-{	
-	return ceilf(f);
-}
 
 float IWEMath::Clamp(float f, float min, float max)
 {		

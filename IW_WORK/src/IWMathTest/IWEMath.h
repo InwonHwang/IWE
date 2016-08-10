@@ -1,29 +1,19 @@
 #pragma once
-#define _USE_MATH_DEFINES
 
-#include <cstdio>
-#include <cmath>
-
-
+#include "stdafx.h"
 
 using namespace std;
 
-
-
-static class IWEMath
+class IWEMath
 {	
-	
-
 private:
-	IWEMath() {}
-	
+	IWEMath() {}	
 
 public:
 	static float Infinity(){ return INFINITY; }
-	static float RadToDeg() { return (M_PI / 180); }
-	static float DegToRad() { return (180 / M_PI); }
+	static float RadToDeg() { return (float)(180 / M_PI); }
+	static float DegToRad() { return (float)(M_PI / 180); }
 
-public:
 	static int Abs(int);
 	static float Abs(float);
 
@@ -41,14 +31,10 @@ public:
 	static float Log10(float);
 
 	static float Round(float);
-	static int RountToInt(float);
-
 	static float Exp(float);
 	static float Floor(float);
-	static int FloorToInt(float);
 
 	static float Ceil(float);
-	static int CeilToInt(float);
 	static float Clamp(float, float, float);
 };
 

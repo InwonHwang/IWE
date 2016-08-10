@@ -132,10 +132,14 @@ void render_frame(void)
 		100.0f);    // the far view-plane
 	g_Device->SetTransform(D3DTS_PROJECTION, &matProjection);    // set the projection
 
-	static float time = 1;
-	obj->transform->scale = D3DXVECTOR3(time, time, time);
+	static float time = 0;
+	//obj->transform->setScale(IWEVector3(time, time, time));
+	//obj->transform->setPosition(IWEVector3(time - 1, time - 1, time - 1));
+	if (time < 30)	
+		obj->transform->setRotation(IWEQuaternion::Euler(0, time, 0));
+	
 	obj->update();	
-	time += 0.001f;
+	time += 0.1f;
 	g_Device->EndScene();
 
 	g_Device->Present(NULL, NULL, NULL, NULL);

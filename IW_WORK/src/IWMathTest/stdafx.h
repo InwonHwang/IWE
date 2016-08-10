@@ -1,12 +1,20 @@
 #pragma once
 
-#pragma comment(lib, "DxErr.lib")
+#define _USE_MATH_DEFINES
 
 #include <d3d9.h>
 #include <d3dx9.h>
 #include <DxErr.h>
 #include <tchar.h>
 #include <string>
+#include <list>
+#include <stdio.h>
+#include <cmath>
+#include "IWEMath.h"
+#include "IWEVector3.h"
+#include "IWEQuaternion.h"
+
+
 
 
 
