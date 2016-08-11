@@ -1,6 +1,8 @@
 #pragma once
 #include "stdafx.h"
 
+class IWEVector3;
+
 class IWEQuaternion
 {
 	friend class Transform;
@@ -44,7 +46,7 @@ public:
 	static float Angle(const IWEQuaternion&, const IWEQuaternion&);
 	static float Dot(const IWEQuaternion&, const IWEQuaternion&);
 	static IWEQuaternion Euler(float x, float y, float z);
-	static IWEQuaternion AngleAxis(float, const IWEVector3&);
+	static IWEQuaternion AngleAxis(float, const IWEVector3& );
 	static IWEQuaternion Inverse(const IWEQuaternion&);
 	static IWEQuaternion SLerp(const IWEQuaternion&, const IWEQuaternion&, float);	
 	
